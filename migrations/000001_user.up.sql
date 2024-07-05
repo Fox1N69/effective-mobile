@@ -7,6 +7,7 @@ CREATE TABLE users (
     address TEXT
 );
 
+-- add columents 
 ALTER TABLE users
 ADD COLUMN created_at TIMESTAMP DEFAULT NOW() NOT NULL,
 ADD COLUMN updated_at TIMESTAMP DEFAULT NOW() NOT NULL;
