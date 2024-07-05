@@ -50,6 +50,7 @@ func (s *SQLClient) SqlMigrate() {
 	if err != nil {
 		logrus.Fatal(op, err)
 	}
+
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		logrus.Fatal(op, err)

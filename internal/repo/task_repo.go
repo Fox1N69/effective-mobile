@@ -27,12 +27,12 @@ func NewTaskRepo(db *sql.DB) TaskRepo {
 
 func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
 	const query = `
-		INSERT INTO tasks (user_id, name, start_time, end_time, total_hours)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO tasks (user_id, name, description ,start_time, end_time, total_hours)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
 	`
 
-	err := r.db.QueryRow(query, task.UserID, task.Name, task.StartTime, task.EndTime, task.TotalHours).Scan(&task.ID)
+	err := r.db.QueryRow(query, task.UserID, task.Name, task.Description, task.StartTime, task.EndTime, task.TotalHours).Scan(&task.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create task")
 	}

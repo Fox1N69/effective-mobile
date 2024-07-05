@@ -1,14 +1,14 @@
 dep:
 	go mod tidy
 
-run:
-	go run cmd/app/main.go
+run-user:
+	go run cmd/user/main.go
 
 test:
 	go test -short -cover ./...
 
-build:
-	go build -o bin/server cmd/app/main.go
+build-user:
+	go build -o bin/server cmd/user/main.go
 
 docker-image:
 	docker build -t server:v1 .

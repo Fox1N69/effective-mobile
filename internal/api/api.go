@@ -59,24 +59,27 @@ func (c *server) v1() {
 		{
 			user.GET("/", userHandler.GetAllUsers)
 			user.GET("/filters", userHandler.UsersWithFiltersAndPagination)
+			user.GET("/:id/workloads", taskHandler.GetWorkloads)
 			user.POST("/", userHandler.CreateUser)
 			user.PATCH("/:id", userHandler.UpdateUser)
 			user.DELETE("/:id", userHandler.DeleteUser)
 
-			task := user.Group(":id/task")
+			// Вложенная группа для задач пользователя
+			task := user.Group("/:id/task")
 			{
-				task.POST("/:id/start", taskHandler.StartTask)
-				task.POST("/:id/stop", taskHandler.StopTask)
+				task.POST("/:task_id/start", taskHandler.StartTask)
+				task.POST("/:task_id/stop", taskHandler.StopTask)
 			}
 		}
 
-		task := api.Group("/task")
+		// Роуты для задач
+		tasks := api.Group("/task")
 		{
-			task.GET("/", taskHandler.GetAllTasks)
-			task.POST("/:id", taskHandler.CreateTask)
-			task.PATCH("/:id", taskHandler.UpdateTask)
-			task.DELETE("/:id", taskHandler.DeleteTask)
+
+			tasks.POST("/", taskHandler.CreateTask)
+			tasks.GET("/", taskHandler.GetAllTasks)
+			tasks.PATCH("/:id", taskHandler.UpdateTask)
+			tasks.DELETE("/:id", taskHandler.DeleteTask)
 		}
 	}
-
 }
