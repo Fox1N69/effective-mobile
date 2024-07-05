@@ -56,6 +56,8 @@ func (c *server) v1() {
 	{
 		user.GET("/", userHandler.GetAllUsers)
 		user.GET("/filter", userHandler.UsersWithFiltersAndPagination)
-		user.POST("/create", userHandler.CreateUser)
+		user.POST("/", userHandler.CreateUser)
+		user.PATCH("/:id", userHandler.UpdateUser)
+		user.DELETE("/:id", userHandler.DeleteUser)
 	}
 }

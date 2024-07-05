@@ -10,6 +10,8 @@ type UserService interface {
 	Users() ([]*models.User, error)
 	UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error)
 	CreateUser(user *models.User) (uint, error)
+	UpdateUser(id uint, user *models.User) error
+	DeleteUser(id uint) error
 }
 
 type userService struct {

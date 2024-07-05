@@ -14,14 +14,16 @@ type UserHandler interface {
 	GetAllUsers(c *gin.Context)
 	UsersWithFiltersAndPagination(c *gin.Context)
 	CreateUser(c *gin.Context)
+	UpdateUser(c *gin.Context)
+	DeleteUser(c *gin.Context)
 }
 
 type userHandler struct {
 	service service.UserService
 }
 
-func NewUserHandler(userService service.UserService) UserHandler {
-	return &userHandler{service: userService}
+func NewUserHandler(service service.UserService) UserHandler {
+	return &userHandler{service: service}
 }
 
 func (h *userHandler) GetAllUsers(c *gin.Context) {
@@ -63,4 +65,36 @@ func (h *userHandler) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"id": id})
+}
+
+func (h *userHandler) UpdateUser(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.Atoi(idStr)
+
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.service.UpdateUser(uint(id), &user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+}
+
+func (h *userHandler) DeleteUser(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.Atoi(idStr)
+
+	err := h.service.DeleteUser(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
