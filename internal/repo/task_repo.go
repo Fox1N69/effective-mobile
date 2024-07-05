@@ -79,6 +79,7 @@ func (r *taskRepo) DeleteByID(id uint) error {
 
 func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 	const op = "repo.taskRepo.FindByID"
+
 	query := `
 		SELECT id, user_id, name, start_time, end_time, total_hours
 		FROM tasks
@@ -99,6 +100,7 @@ func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 
 func (r *taskRepo) Tasks() ([]*models.Task, error) {
 	const op = "repo.taskRepo.Tasks"
+
 	query := `
 		SELECT *
 		FROM tasks
