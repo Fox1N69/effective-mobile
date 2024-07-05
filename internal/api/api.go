@@ -55,7 +55,7 @@ func (c *server) v1() {
 	user := c.gin.Group("/user")
 	{
 		user.GET("/", userHandler.GetAllUsers)
-		user.GET("/filter", userHandler.UsersWithFiltersAndPagination)
+		user.GET("/filters", userHandler.UsersWithFiltersAndPagination)
 		user.POST("/", userHandler.CreateUser)
 		user.PATCH("/:id", userHandler.UpdateUser)
 		user.DELETE("/:id", userHandler.DeleteUser)

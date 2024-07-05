@@ -53,7 +53,7 @@ func (r *userRepo) Users() ([]*models.User, error) {
 
 func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error) {
 	query := `
-		SELECT id, passport_number, surname, name, patronymic, address, created_at, updated_at
+		SELECT *
 		FROM users
 		WHERE ($1 = '' OR passport_number = $1)
 		  AND ($2 = '' OR surname = $2)
@@ -84,7 +84,7 @@ func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagi
 
 func (r *userRepo) UserByID(id uint) (*models.User, error) {
 	query := `
-		SELECT id, passport_number, surname, name, patronymic, address, created_at, updated_at
+		SELECT *
 		FROM users
 		WHERE id = $1
 	`
