@@ -12,7 +12,7 @@ type TaskRepo interface {
 	Update(task *models.Task) (*models.Task, error)
 	DeleteByID(id int) error
 	FindByID(id int) (*models.Task, error)
-	FindAll() ([]*models.Task, error)
+	Tasks() ([]*models.Task, error)
 }
 
 type taskRepo struct {
@@ -69,7 +69,7 @@ func (r *taskRepo) DeleteByID(id int) error {
 
 func (r *taskRepo) FindByID(id int) (*models.Task, error) {
 	const query = `
-		SELECT id, user_id, name, start_time, end_time, total_hours
+		SELECT *
 		FROM tasks
 		WHERE id = $1
 	`
@@ -86,9 +86,9 @@ func (r *taskRepo) FindByID(id int) (*models.Task, error) {
 	return &task, nil
 }
 
-func (r *taskRepo) FindAll() ([]*models.Task, error) {
+func (r *taskRepo) Tasks() ([]*models.Task, error) {
 	const query = `
-		SELECT id, user_id, name, start_time, end_time, total_hours
+		SELECT *
 		FROM tasks
 	`
 
