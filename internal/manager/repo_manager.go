@@ -39,6 +39,7 @@ var (
 	taskRepo     repo.TaskRepo
 )
 
+// TaskRepo return an instance of the TaskRepo implementation through the RepoMangaer
 func (rm *repoManager) TaskRepo() repo.TaskRepo {
 	taskRepoOnce.Do(func() {
 		taskRepo = repo.NewTaskRepo(rm.infra.SQLClient().DB)
