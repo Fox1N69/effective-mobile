@@ -34,7 +34,7 @@ var (
 func (sm *serviceManager) UserService() service.UserService {
 	userServiceOnce.Do(func() {
 		userRepo := sm.repo.UserRepo()
-		userService = service.NewUserService(userRepo)
+		userService = service.NewUserService(userRepo, sm.infra.UserAPIClient())
 	})
 	return userService
 }

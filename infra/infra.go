@@ -25,6 +25,7 @@ type Infra interface {
 	RedisClient() *redis.Client
 	SQLClient() *clients.SQLClient
 	RunSQLMigrations()
+	UserAPIClient() *clients.UserAPIClient
 }
 
 type infra struct {
@@ -190,4 +191,10 @@ func (i *infra) SQLClient() *clients.SQLClient {
 
 func (i *infra) RunSQLMigrations() {
 	i.SQLClient().SqlMigrate()
+}
+
+func (i *infra) UserAPIClient() *clients.UserAPIClient {
+	baseURL := i.Config().Sub("user_api_client").GetString("baseURL")
+	client := clients.NewUserAPIClient(baseURL)
+	return client
 }

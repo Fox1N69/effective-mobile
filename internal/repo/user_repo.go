@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"test-task/internal/models"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type UserRepo interface {
 	Users() ([]*models.User, error)
 	UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error)
 	UserByID(id uint) (*models.User, error)
-	Create(user *models.User) (uint, error)
+	Create(user *models.User) (*models.User, error)
 	Update(id uint, user *models.User) error
 	Delete(id uint) error
 }
@@ -97,19 +99,23 @@ func (r *userRepo) UserByID(id uint) (*models.User, error) {
 	return user, nil
 }
 
-func (r *userRepo) Create(user *models.User) (uint, error) {
+func (r *userRepo) Create(user *models.User) (*models.User, error) {
+	const op = "repo.userRepo.Create"
 	query := `
 		INSERT INTO users (passport_number, surname, name, patronymic, address, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id
 	`
+
 	now := time.Now()
 	err := r.db.QueryRowContext(context.Background(), query, user.PassportNumber, user.Surname, user.Name, user.Patronymic, user.Address, now, now).Scan(&user.ID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to insert user: %v", err)
+		return nil, errors.Wrap(err, "failed to create user")
 	}
 
-	return user.ID, nil
+	user.CreatedAt = now
+	user.UpdatedAt = now
+	return user, nil
 }
 
 func (r *userRepo) Update(id uint, user *models.User) error {

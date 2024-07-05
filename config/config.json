@@ -19,5 +19,8 @@
     "addr": "localhost:6379",
     "password": "",
     "db": 0
+  },
+  "user_api_client": {
+    "baseURL": "https://668869c70bc7155dc01b520a.mockapi.io/api"
   }
 }

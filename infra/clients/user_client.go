@@ -36,10 +36,18 @@ func (c *UserAPIClient) FetchUserInfo(passportSerie, passportNumber string) (*mo
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var userInfo models.UserInfo
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+	//var userInfos []models.UserInfo
+	var userInfos models.UserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfos); err != nil {
 		return nil, errors.Wrap(err, "failed to decode response from user API")
 	}
 
-	return &userInfo, nil
+	/*
+		if len(userInfos) == 0 {
+			return nil, errors.New("no user info found")
+		}
+
+		return &userInfos[0], nil
+	*/
+	return &userInfos, nil
 }

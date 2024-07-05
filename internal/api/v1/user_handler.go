@@ -52,19 +52,21 @@ func (h *userHandler) UsersWithFiltersAndPagination(c *gin.Context) {
 }
 
 func (h *userHandler) CreateUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var input struct {
+		PassportNumber string `json:"passportNumber"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id, err := h.service.CreateUser(&user)
+	createdUser, err := h.service.CreateUser(input.PassportNumber)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, gin.H{"message": "create user success", "user": createdUser})
 }
 
 func (h *userHandler) UpdateUser(c *gin.Context) {
