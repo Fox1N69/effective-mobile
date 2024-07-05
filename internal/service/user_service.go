@@ -3,6 +3,7 @@ package service
 import (
 	"test-task/internal/models"
 	"test-task/internal/repo"
+	"time"
 )
 
 type UserService interface {
@@ -28,5 +29,14 @@ func (s *userService) UsersWithFiltersAndPagination(params models.UserFilters, p
 }
 
 func (s *userService) CreateUser(user *models.User) (uint, error) {
-	return s.repository.CreateUser(user)
+	return s.repository.Create(user)
+}
+
+func (s *userService) UpdateUser(id uint, user *models.User) error {
+	user.UpdatedAt = time.Now()
+	return s.repository.Update(id, user)
+}
+
+func (s *userService) DeleteUser(id uint) error {
+	return s.repository.Delete(id)
 }

@@ -11,7 +11,10 @@ import (
 type UserRepo interface {
 	Users() ([]*models.User, error)
 	UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error)
-	CreateUser(user *models.User) (uint, error)
+	UserByID(id uint) (*models.User, error)
+	Create(user *models.User) (uint, error)
+	Update(id uint, user *models.User) error
+	Delete(id uint) error
 }
 
 type userRepo struct {
@@ -79,7 +82,7 @@ func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagi
 	return users, nil
 }
 
-func (r *userRepo) GetUserByID(id int) (*models.User, error) {
+func (r *userRepo) UserByID(id uint) (*models.User, error) {
 	query := `
 		SELECT id, passport_number, surname, name, patronymic, address, created_at, updated_at
 		FROM users
@@ -94,7 +97,7 @@ func (r *userRepo) GetUserByID(id int) (*models.User, error) {
 	return user, nil
 }
 
-func (r *userRepo) CreateUser(user *models.User) (uint, error) {
+func (r *userRepo) Create(user *models.User) (uint, error) {
 	query := `
 		INSERT INTO users (passport_number, surname, name, patronymic, address, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -107,4 +110,32 @@ func (r *userRepo) CreateUser(user *models.User) (uint, error) {
 	}
 
 	return user.ID, nil
+}
+
+func (r *userRepo) Update(id uint, user *models.User) error {
+	query := `
+		UPDATE users
+		SET passport_number = $1, surname = $2, name = $3, patronymic = $4, address = $5, updated_at = $6
+		WHERE id = $7
+	`
+	now := time.Now()
+	_, err := r.db.ExecContext(context.Background(), query, user.PassportNumber, user.Surname, user.Name, user.Patronymic, user.Address, now, id)
+	if err != nil {
+		return fmt.Errorf("failed to update user: %v", err)
+	}
+
+	return nil
+}
+
+func (r *userRepo) Delete(id uint) error {
+	query := `
+		DELETE FROM users
+		WHERE id = $1
+	`
+	_, err := r.db.ExecContext(context.Background(), query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete user: %v", err)
+	}
+
+	return nil
 }
