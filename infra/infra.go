@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"shop-server/common/util/smtp"
 	"sync"
+	"test-task/common/util/smtp"
 	"time"
 
 	"github.com/gin-gonic/gin"

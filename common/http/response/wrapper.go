@@ -2,7 +2,7 @@ package response
 
 import (
 	"net/http"
-	"shop-server/internal/models"
+	"test-task/internal/models"
 
 	"github.com/gin-gonic/gin"
 )

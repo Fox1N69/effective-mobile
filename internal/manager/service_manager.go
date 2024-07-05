@@ -3,7 +3,8 @@ package manager
 import (
 	"sync"
 
-	"shop-server/infra"
+	"test-task/infra"
+	"test-task/internal/service"
 )
 
 type ServiceManager interface {
@@ -22,13 +23,14 @@ func NewServiceManager(infra infra.Infra) ServiceManager {
 }
 
 var (
-	orderServiceOnce sync.Once
-	orderService     service.OrderService
+	userServiceOnce sync.Once
+	userService     service.UserService
 )
 
-func (sm *serviceManager) OrderService() service.OrderService {
-	orderServiceOnce.Do(func() {
-		orderService = service.NewOrderService(sm.repo.OrderRepo())
+func (sm *serviceManager) UserService() service.UserService {
+	userServiceOnce.Do(func() {
+		userRepo := sm.repo.UserRepo()
+		userService = service.NewUserService(userRepo)
 	})
-	return orderService
+	return userService
 }

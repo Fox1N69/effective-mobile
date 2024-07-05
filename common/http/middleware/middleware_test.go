@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"shop-server/common/http/middleware"
-	"shop-server/common/http/request"
-	"shop-server/common/util/token"
+	"test-task/common/http/middleware"
+	"test-task/common/http/request"
+	"test-task/common/util/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"

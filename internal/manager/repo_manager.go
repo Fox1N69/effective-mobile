@@ -3,10 +3,12 @@ package manager
 import (
 	"sync"
 
-	"shop-server/infra"
+	"test-task/infra"
+	"test-task/internal/repo"
 )
 
 type RepoManager interface {
+	UserRepo() repo.UserRepo
 }
 
 type repoManager struct {
@@ -18,13 +20,13 @@ func NewRepoManager(infra infra.Infra) RepoManager {
 }
 
 var (
-	orderRepoOnce sync.Once
-	orderRepo     repo.OrderRepo
+	userRepoOnce sync.Once
+	userRepo     repo.UserRepo
 )
 
-func (rm *repoManager) OrderRepo() repo.OrderRepo {
-	orderRepoOnce.Do(func() {
-		orderRepo = repo.NewOrderRepo(rm.infra.GormDB())
+func (rm *repoManager) UserRepo() repo.UserRepo {
+	userRepoOnce.Do(func() {
+		userRepo = repo.NewUserRepo(rm.infra.GormDB())
 	})
-	return orderRepo
+	return userRepo
 }

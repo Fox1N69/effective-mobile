@@ -14,7 +14,7 @@ ADD . .
 
 RUN go test -short ./...
 
-RUN go build -o /bin/shop-server app/main.go
+RUN go build -o /bin/test-task app/main.go
 
 WORKDIR /
 
@@ -24,4 +24,4 @@ COPY config/config.json /config/config.json
 
 EXPOSE 3000
 
-CMD /bin/shop-server
+CMD /bin/test-task

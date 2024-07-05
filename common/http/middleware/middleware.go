@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"shop-server/common/http/response"
-	"shop-server/common/util/token"
+	"test-task/common/http/response"
+	"test-task/common/util/token"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
