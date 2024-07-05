@@ -3,11 +3,11 @@ CREATE TABLE IF NOT EXISTS tasks (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT, 
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
     total_hours DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 -- Index on user_id for faster queries

@@ -116,7 +116,7 @@ func (h *taskHandler) StartTask(c *gin.Context) {
 
 	task, err := h.taskService.GetTaskByID(uint(taskID))
 	if err != nil {
-		response.New(c).Error(http.StatusNotFound, err) // Возвращаем 404 если задача не найдена
+		response.New(c).Error(http.StatusNotFound, err)
 		return
 	}
 
