@@ -15,6 +15,7 @@ type serviceManager struct {
 	repo  RepoManager
 }
 
+// NewServiceManager ...
 func NewServiceManager(infra infra.Infra) ServiceManager {
 	return &serviceManager{
 		infra: infra,
@@ -27,6 +28,7 @@ var (
 	userService     service.UserService
 )
 
+// UserService returns an instance of the UserService implementation through the ServiceManager.
 func (sm *serviceManager) UserService() service.UserService {
 	userServiceOnce.Do(func() {
 		userRepo := sm.repo.UserRepo()
