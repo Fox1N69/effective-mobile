@@ -10,8 +10,8 @@ import (
 type TaskRepo interface {
 	Create(task *models.Task) (*models.Task, error)
 	Update(task *models.Task) (*models.Task, error)
-	DeleteByID(id int) error
-	FindByID(id int) (*models.Task, error)
+	DeleteByID(id uint) error
+	FindByID(id uint) (*models.Task, error)
 	Tasks() ([]*models.Task, error)
 }
 
@@ -53,7 +53,7 @@ func (r *taskRepo) Update(task *models.Task) (*models.Task, error) {
 	return task, nil
 }
 
-func (r *taskRepo) DeleteByID(id int) error {
+func (r *taskRepo) DeleteByID(id uint) error {
 	const query = `
 		DELETE FROM tasks
 		WHERE id = $1
@@ -67,7 +67,7 @@ func (r *taskRepo) DeleteByID(id int) error {
 	return nil
 }
 
-func (r *taskRepo) FindByID(id int) (*models.Task, error) {
+func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 	const query = `
 		SELECT *
 		FROM tasks
