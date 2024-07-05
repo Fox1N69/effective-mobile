@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
@@ -40,11 +39,6 @@ var (
 
 func (i *infra) Config() *viper.Viper {
 	vprOnce.Do(func() {
-		err := godotenv.Load()
-		if err != nil {
-			logrus.Fatalf("Error loading .env file")
-		}
-
 		viper.SetConfigFile(i.configFile)
 		if err := viper.ReadInConfig(); err != nil {
 			logrus.Fatalf("[infra][Config][viper.ReadInConfig] %v", err)
