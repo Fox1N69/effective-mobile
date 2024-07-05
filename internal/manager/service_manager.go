@@ -8,6 +8,7 @@ import (
 )
 
 type ServiceManager interface {
+	UserService() service.UserService
 }
 
 type serviceManager struct {

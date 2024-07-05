@@ -28,7 +28,7 @@ var (
 // UserRepo returns an instance of the UserRepo implementation through the RepoManager.
 func (rm *repoManager) UserRepo() repo.UserRepo {
 	userRepoOnce.Do(func() {
-		userRepo = repo.NewUserRepo(rm.infra.GormDB())
+		userRepo = repo.NewUserRepo(rm.infra.SQLClient().DB)
 	})
 	return userRepo
 }

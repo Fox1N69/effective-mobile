@@ -4,6 +4,7 @@ import (
 	"test-task/common/http/middleware"
 	"test-task/common/http/request"
 	"test-task/infra"
+	v1 "test-task/internal/api/v1"
 	"test-task/internal/manager"
 
 	"github.com/gin-gonic/gin"
@@ -49,5 +50,10 @@ func (c *server) handlers() {
 }
 
 func (c *server) v1() {
+	userHandler := v1.NewUserHandler(c.service.UserService())
 
+	user := c.gin.Group("/user")
+	{
+		user.GET("/", userHandler.GetAllUsers)
+	}
 }
