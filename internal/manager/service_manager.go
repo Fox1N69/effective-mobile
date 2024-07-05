@@ -37,3 +37,18 @@ func (sm *serviceManager) UserService() service.UserService {
 	})
 	return userService
 }
+
+var (
+	taskServiceOnce sync.Once
+	taskService     service.TaskService
+)
+
+// TaskService returns ad instance of the TaskService implementation through the ServiceManager.
+func (sm *serviceManager) TaskService() service.TaskService {
+	taskServiceOnce.Do(func() {
+		taskRepo := sm.repo.TaskRepo()
+		taskService = service.NewTaskService(taskRepo)
+	})
+
+	return taskService
+}
