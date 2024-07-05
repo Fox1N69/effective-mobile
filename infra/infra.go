@@ -19,9 +19,11 @@ type Infra interface {
 	Config() *viper.Viper
 	SetMode() string
 	GormDB() *gorm.DB
-	Migrate(values ...interface{})
+	GormMigrate(values ...interface{})
 	Port() string
 	RedisClient() *redis.Client
+	SQLClient() *SQLClient
+	RunSQLMigrations()
 }
 
 type infra struct {
@@ -116,7 +118,7 @@ var (
 	migrateOnce sync.Once
 )
 
-func (i *infra) Migrate(values ...interface{}) {
+func (i *infra) GormMigrate(values ...interface{}) {
 	migrateOnce.Do(func() {
 		if i.SetMode() == gin.DebugMode {
 			if err := i.GormDB().Debug().AutoMigrate(values...); err != nil {
@@ -169,4 +171,31 @@ func (i *infra) RedisClient() *redis.Client {
 	})
 
 	return rdb
+}
+
+var (
+	sqlClientOnce sync.Once
+	sqlClient     *SQLClient
+)
+
+func (i *infra) SQLClient() *SQLClient {
+	sqlClientOnce.Do(func() {
+		config := i.Config().Sub("database")
+		user := config.GetString("user")
+		pass := config.GetString("pass")
+		host := config.GetString("host")
+		port := config.GetString("port")
+		name := config.GetString("name")
+
+		client := NewSQLClient()
+		client.Connect(user, pass, host, port, name)
+		sqlClient = client
+		logrus.Println("Connected to SQLClient")
+	})
+
+	return sqlClient
+}
+
+func (i *infra) RunSQLMigrations() {
+	i.SQLClient().SqlMigrate()
 }

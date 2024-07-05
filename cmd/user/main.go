@@ -1,11 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"test-task/infra"
+	"test-task/internal/api"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	i := infra.New("/.env")
-	fmt.Print(i.Config())
+	logrus.Println("Starting application...")
+	i := infra.New("config/config.json")
+	i.SetMode()
+	i.SQLClient()
+	i.RunSQLMigrations()
+
+	api.NewServer(i, i.RedisClient()).Run()
 }
