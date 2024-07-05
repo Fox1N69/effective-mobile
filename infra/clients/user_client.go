@@ -24,6 +24,11 @@ func NewUserAPIClient(baseURL string) *UserAPIClient {
 	}
 }
 
+// FetchUserInfo retrieves user information from the API based on the given passport series and number
+//
+// # If your api returns data in an array
+//
+// then uncomment the commented code and delete "var userInfos models.UserInfo"
 func (c *UserAPIClient) FetchUserInfo(passportSerie, passportNumber string) (*models.UserInfo, error) {
 	reqURL := fmt.Sprintf("%s/info?passportSerie=%s&passportNumber=%s", c.BaseURL, passportSerie, passportNumber)
 	resp, err := c.HTTPClient.Get(reqURL)

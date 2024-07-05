@@ -19,6 +19,7 @@ func NewSQLClient() *SQLClient {
 	return &SQLClient{}
 }
 
+// Connect establishes a connection to the PostgreSQL database
 func (s *SQLClient) Connect(user, password, host, port, dbname string) {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
 	db, err := sql.Open("postgres", dsn)
@@ -33,6 +34,7 @@ func (s *SQLClient) Connect(user, password, host, port, dbname string) {
 	s.DB = db
 }
 
+// Close terminates the connection to the database
 func (s *SQLClient) Close() {
 	if s.DB != nil {
 		s.DB.Close()
@@ -40,6 +42,7 @@ func (s *SQLClient) Close() {
 	}
 }
 
+// SqlMigrate performs database schema migrations using Golang Migrate
 func (s *SQLClient) SqlMigrate() {
 	const op = "infra.SQLClient.SqlMigrate"
 	driver, err := postgres.WithInstance(s.DB, &postgres.Config{})

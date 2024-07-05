@@ -18,6 +18,7 @@ func NewMiddleware(secretKey string) Middleware {
 	return &middleware{secretKey: secretKey}
 }
 
+// CORS ...
 func (m *middleware) CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
