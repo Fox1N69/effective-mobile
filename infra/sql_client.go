@@ -43,11 +43,11 @@ func (s *SQLClient) Close() {
 
 func (s *SQLClient) SqlMigrate() {
 	const op = "infra.SQLClient.SqlMigrate"
-	migrationsDriver, err := postgres.WithInstance(s.DB, &postgres.Config{})
+	driver, err := postgres.WithInstance(s.DB, &postgres.Config{})
 	if err != nil {
 		logrus.Fatal(op, err)
 	}
-	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", migrationsDriver)
+	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
 	if err != nil {
 		logrus.Fatal(op, err)
 	}

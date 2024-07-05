@@ -21,7 +21,8 @@ func NewUserRepo(db *sql.DB) UserRepo {
 func (r *userRepo) Users() ([]*models.User, error) {
 	const op = "repo.userRepo.Users"
 
-	rows, err := r.db.Query(`SELECT * FROM users`)
+
+	rows, err := r.db.Query(`SELECT * FROM users 1 = 1`)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching all users: %s %w", op, err)
 	}
