@@ -12,3 +12,10 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }
+
+type UserInfo struct {
+	Surname    string `json:"surname"`
+	Name       string `json:"name"`
+	Patronymic string `json:"patronymic"`
+	Address    string `json:"address"`
+}
