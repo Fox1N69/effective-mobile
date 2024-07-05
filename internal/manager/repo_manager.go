@@ -9,6 +9,7 @@ import (
 
 type RepoManager interface {
 	UserRepo() repo.UserRepo
+	TaskRepo() repo.TaskRepo
 }
 
 type repoManager struct {
@@ -31,4 +32,16 @@ func (rm *repoManager) UserRepo() repo.UserRepo {
 		userRepo = repo.NewUserRepo(rm.infra.SQLClient().DB)
 	})
 	return userRepo
+}
+
+var (
+	taskRepoOnce sync.Once
+	taskRepo     repo.TaskRepo
+)
+
+func (rm *repoManager) TaskRepo() repo.TaskRepo {
+	taskRepoOnce.Do(func() {
+		taskRepo = repo.NewTaskRepo(rm.infra.SQLClient().DB)
+	})
+	return taskRepo
 }
