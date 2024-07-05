@@ -7,6 +7,8 @@ import (
 
 type UserService interface {
 	Users() ([]*models.User, error)
+	UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error)
+	CreateUser(user *models.User) (uint, error)
 }
 
 type userService struct {
@@ -19,4 +21,12 @@ func NewUserService(userRepo repo.UserRepo) UserService {
 
 func (s *userService) Users() ([]*models.User, error) {
 	return s.repository.Users()
+}
+
+func (s *userService) UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error) {
+	return s.repository.UsersWithFiltersAndPagination(params, pagination)
+}
+
+func (s *userService) CreateUser(user *models.User) (uint, error) {
+	return s.repository.CreateUser(user)
 }

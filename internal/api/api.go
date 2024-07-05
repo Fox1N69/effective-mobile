@@ -55,5 +55,6 @@ func (c *server) v1() {
 	user := c.gin.Group("/user")
 	{
 		user.GET("/", userHandler.GetAllUsers)
+		user.GET("/filter", userHandler.UsersWithFiltersAndPagination)
 	}
 }

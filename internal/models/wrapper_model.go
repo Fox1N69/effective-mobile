@@ -5,7 +5,13 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-type Token struct {
-	Expired string `json:"expired"`
-	Token   string `json:"token"`
+type UserFilters struct {
+	PassportNumber string `json:"passportNumber,omitempty"`
+	Surname        string `json:"surname,omitempty"`
+	Name           string `json:"name,omitempty"`
+}
+
+type Pagination struct {
+	Page     int `json:"page"`
+	PageSize int `json:"pageSize"`
 }

@@ -173,27 +173,19 @@ func (i *infra) RedisClient() *redis.Client {
 	return rdb
 }
 
-var (
-	sqlClientOnce sync.Once
-	sqlClient     *SQLClient
-)
-
 func (i *infra) SQLClient() *SQLClient {
-	sqlClientOnce.Do(func() {
-		config := i.Config().Sub("database")
-		user := config.GetString("user")
-		pass := config.GetString("pass")
-		host := config.GetString("host")
-		port := config.GetString("port")
-		name := config.GetString("name")
+	config := i.Config().Sub("database")
+	user := config.GetString("user")
+	pass := config.GetString("pass")
+	host := config.GetString("host")
+	port := config.GetString("port")
+	name := config.GetString("name")
 
-		client := NewSQLClient()
-		client.Connect(user, pass, host, port, name)
-		sqlClient = client
-		logrus.Println("Connected to SQLClient")
-	})
+	client := NewSQLClient()
+	client.Connect(user, pass, host, port, name)
+	logrus.Println("Connected to SQLClient")
 
-	return sqlClient
+	return client
 }
 
 func (i *infra) RunSQLMigrations() {
