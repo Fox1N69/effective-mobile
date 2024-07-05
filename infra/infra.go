@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"test-task/infra/clients"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ type Infra interface {
 	GormMigrate(values ...interface{})
 	Port() string
 	RedisClient() *redis.Client
-	SQLClient() *SQLClient
+	SQLClient() *clients.SQLClient
 	RunSQLMigrations()
 }
 
@@ -173,7 +174,7 @@ func (i *infra) RedisClient() *redis.Client {
 	return rdb
 }
 
-func (i *infra) SQLClient() *SQLClient {
+func (i *infra) SQLClient() *clients.SQLClient {
 	config := i.Config().Sub("database")
 	user := config.GetString("user")
 	pass := config.GetString("pass")
@@ -181,7 +182,7 @@ func (i *infra) SQLClient() *SQLClient {
 	port := config.GetString("port")
 	name := config.GetString("name")
 
-	client := NewSQLClient()
+	client := clients.NewSQLClient()
 	client.Connect(user, pass, host, port, name)
 
 	return client
