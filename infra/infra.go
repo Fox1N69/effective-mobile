@@ -183,7 +183,6 @@ func (i *infra) SQLClient() *SQLClient {
 
 	client := NewSQLClient()
 	client.Connect(user, pass, host, port, name)
-	logrus.Println("Connected to SQLClient")
 
 	return client
 }

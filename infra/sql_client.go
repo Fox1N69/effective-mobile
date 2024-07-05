@@ -31,7 +31,6 @@ func (s *SQLClient) Connect(user, password, host, port, dbname string) {
 	}
 
 	s.DB = db
-	logrus.Println("Connected to PostgreSQL")
 }
 
 func (s *SQLClient) Close() {
