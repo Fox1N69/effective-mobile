@@ -2,10 +2,10 @@ package repo
 
 import (
 	"database/sql"
+	"fmt"
 	"test-task/internal/models"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,12 +30,6 @@ func NewTaskRepo(db *sql.DB, log *logrus.Logger) TaskRepo {
 	}
 }
 
-func (r *taskRepo) logError(err error, format string, args ...interface{}) {
-	if err != nil {
-		r.log.Errorf(format+": %s", append(args, err)...)
-	}
-}
-
 func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
 	const op = "repo.taskRepo.Create"
 	query := `
@@ -46,8 +40,7 @@ func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
 
 	err := r.db.QueryRow(query, task.UserID, task.Name, task.Description, task.StartTime, task.EndTime, task.TotalHours).Scan(&task.ID)
 	if err != nil {
-		r.logError(err, "failed to create task", op)
-		return nil, errors.Wrap(err, "failed to create task")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return task, nil
@@ -63,8 +56,7 @@ func (r *taskRepo) Update(task *models.Task) (*models.Task, error) {
 
 	_, err := r.db.Exec(query, task.UserID, task.Name, task.StartTime, task.EndTime, task.TotalHours, task.ID)
 	if err != nil {
-		r.logError(err, "failed to update task", op)
-		return nil, errors.Wrap(err, "failed to update task")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return task, nil
@@ -79,8 +71,7 @@ func (r *taskRepo) DeleteByID(id uint) error {
 
 	_, err := r.db.Exec(query, id)
 	if err != nil {
-		r.logError(err, "failed to delete task", op)
-		return errors.Wrap(err, "failed to delete task")
+		return fmt.Errorf("%s %w", op, err)
 	}
 
 	return nil
@@ -98,11 +89,9 @@ func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 	err := r.db.QueryRow(query, id).Scan(&task.ID, &task.UserID, &task.Name, &task.StartTime, &task.EndTime, &task.TotalHours)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			r.logError(err, "task not found", op)
-			return nil, errors.Wrap(err, "task not found")
+			return nil, fmt.Errorf("%s %w", op, err)
 		}
-		r.logError(err, "failed to fetch task", op)
-		return nil, errors.Wrap(err, "failed to fetch task")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return &task, nil
@@ -117,8 +106,7 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 
 	rows, err := r.db.Query(query)
 	if err != nil {
-		r.logError(err, "failed to fetch tasks", op)
-		return nil, errors.Wrap(err, "failed to fetch tasks")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 	defer rows.Close()
 
@@ -127,15 +115,13 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 		var task models.Task
 		err := rows.Scan(&task.ID, &task.UserID, &task.Name, &task.StartTime, &task.EndTime, &task.TotalHours)
 		if err != nil {
-			r.logError(err, "failed to scan task row", op)
-			return nil, errors.Wrap(err, "failed to scan task row")
+			return nil, fmt.Errorf("%s %w", op, err)
 		}
 		tasks = append(tasks, &task)
 	}
 
 	if err := rows.Err(); err != nil {
-		r.logError(err, "error in fetching tasks rows", op)
-		return nil, errors.Wrap(err, "error in fetching tasks rows")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return tasks, nil
@@ -154,8 +140,7 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 
 	rows, err := r.db.Query(query, userID, startDate, endDate)
 	if err != nil {
-		r.logError(err, "failed to fetch workloads", op)
-		return nil, errors.Wrap(err, "failed to fetch workloads")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 	defer rows.Close()
 
@@ -164,14 +149,12 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 		var workload models.Workload
 		err := rows.Scan(&workload.TaskName, &workload.TotalHours)
 		if err != nil {
-			r.logError(err, "failed to scan workload row", op)
-			return nil, errors.Wrap(err, "failed to scan workload row")
+			return nil, fmt.Errorf("%s %w", op, err)
 		}
 		workloads = append(workloads, &workload)
 	}
 	if err := rows.Err(); err != nil {
-		r.logError(err, "error in fetching workloads rows", op)
-		return nil, errors.Wrap(err, "error in fetching workloads rows")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return workloads, nil

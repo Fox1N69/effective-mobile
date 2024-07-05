@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"test-task/internal/models"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 type UserRepo interface {
@@ -32,7 +30,7 @@ func (r *userRepo) Users() ([]*models.User, error) {
 
 	rows, err := r.db.Query(`SELECT * FROM users 1 = 1`)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching all users: %s %w", op, err)
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 	defer rows.Close()
 
@@ -41,19 +39,21 @@ func (r *userRepo) Users() ([]*models.User, error) {
 		var user models.User
 		err := rows.Scan(&user.ID, &user.Name, &user.Surname, &user.Patronymic, &user.PassportNumber, &user.Address)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning user row: %s %w", op, err)
+			return nil, fmt.Errorf("%s %w", op, err)
 		}
 		users = append(users, &user)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error scaning user row: %s %w", op, err)
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return users, nil
 }
 
 func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagination models.Pagination) ([]*models.User, error) {
+	const op = "repo.user_repo.UsersWithFiltersAndPagination"
+
 	query := `
 		SELECT *
 		FROM users
@@ -67,7 +67,7 @@ func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagi
 
 	rows, err := r.db.QueryContext(context.Background(), query, params.PassportNumber, params.Surname, params.Name, pagination.PageSize, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch users: %v", err)
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 	defer rows.Close()
 
@@ -76,7 +76,7 @@ func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagi
 		user := &models.User{}
 		err := rows.Scan(&user.ID, &user.PassportNumber, &user.Surname, &user.Name, &user.Patronymic, &user.Address, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
-			return nil, fmt.Errorf("failed to scan user row: %v", err)
+			return nil, fmt.Errorf("%s %w", op, err)
 		}
 		users = append(users, user)
 	}
@@ -85,6 +85,8 @@ func (r *userRepo) UsersWithFiltersAndPagination(params models.UserFilters, pagi
 }
 
 func (r *userRepo) UserByID(id uint) (*models.User, error) {
+	const op = "repo.user_repo.UserByID"
+
 	query := `
 		SELECT *
 		FROM users
@@ -93,7 +95,7 @@ func (r *userRepo) UserByID(id uint) (*models.User, error) {
 	user := &models.User{}
 	err := r.db.QueryRowContext(context.Background(), query, id).Scan(&user.ID, &user.PassportNumber, &user.Surname, &user.Name, &user.Patronymic, &user.Address, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch user: %v", err)
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return user, nil
@@ -101,6 +103,7 @@ func (r *userRepo) UserByID(id uint) (*models.User, error) {
 
 func (r *userRepo) Create(user *models.User) (*models.User, error) {
 	const op = "repo.userRepo.Create"
+
 	query := `
 		INSERT INTO users (passport_number, surname, name, patronymic, address, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -110,7 +113,7 @@ func (r *userRepo) Create(user *models.User) (*models.User, error) {
 	now := time.Now()
 	err := r.db.QueryRowContext(context.Background(), query, user.PassportNumber, user.Surname, user.Name, user.Patronymic, user.Address, now, now).Scan(&user.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create user")
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	user.CreatedAt = now
@@ -119,6 +122,8 @@ func (r *userRepo) Create(user *models.User) (*models.User, error) {
 }
 
 func (r *userRepo) Update(id uint, user *models.User) error {
+	const op = "repo.user_repo.Update"
+
 	query := `
 		UPDATE users
 		SET passport_number = $1, surname = $2, name = $3, patronymic = $4, address = $5, updated_at = $6
@@ -127,20 +132,22 @@ func (r *userRepo) Update(id uint, user *models.User) error {
 	now := time.Now()
 	_, err := r.db.ExecContext(context.Background(), query, user.PassportNumber, user.Surname, user.Name, user.Patronymic, user.Address, now, id)
 	if err != nil {
-		return fmt.Errorf("failed to update user: %v", err)
+		return fmt.Errorf("%s %w", op, err)
 	}
 
 	return nil
 }
 
 func (r *userRepo) Delete(id uint) error {
+	const op = "repo.user_repo.Delete"
+
 	query := `
 		DELETE FROM users
 		WHERE id = $1
 	`
 	_, err := r.db.ExecContext(context.Background(), query, id)
 	if err != nil {
-		return fmt.Errorf("failed to delete user: %v", err)
+		return fmt.Errorf("%s %w", op, err)
 	}
 
 	return nil
