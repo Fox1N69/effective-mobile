@@ -60,12 +60,11 @@ func (c *server) v1() {
 		{
 			user.GET("/", userHandler.GetAllUsers)
 			user.GET("/filters", userHandler.UsersWithFiltersAndPagination)
-			user.GET("/:id/workloads", taskHandler.GetWorkloads)
+			user.GET("/:user_id/workloads", taskHandler.GetWorkloads)
 			user.POST("/", userHandler.CreateUser)
 			user.PATCH("/:id", userHandler.UpdateUser)
 			user.DELETE("/:id", userHandler.DeleteUser)
 
-			// Вложенная группа для задач пользователя
 			task := user.Group("/:user_id/task")
 			{
 				task.POST("/:task_id/start", taskHandler.StartTask)

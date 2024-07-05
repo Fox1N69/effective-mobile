@@ -133,10 +133,10 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 	const op = "repo.taskRepo.GetWorkloads"
 
 	query := `
-		SELECT task_name, SUM(hours) AS total_hours
+		SELECT name, SUM(total_hours) AS total_hours
 		FROM tasks
 		WHERE user_id = $1 AND start_time >= $2 AND end_time <= $3
-		GROUP BY task_name
+		GROUP BY name
 		ORDER BY total_hours DESC
 	`
 

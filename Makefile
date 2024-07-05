@@ -2,13 +2,13 @@ dep:
 	go mod tidy
 
 run-user:
-	go run cmd/user/main.go
+	go run cmd/time-tracker/main.go
 
 test:
 	go test -short -cover ./...
 
 build-user:
-	go build -o bin/server cmd/user/main.go
+	go build -o bin/server cmd/time-tracker/main.go
 
 docker-image:
 	docker build -t server:v1 .
