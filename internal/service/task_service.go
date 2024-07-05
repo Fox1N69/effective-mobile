@@ -14,6 +14,7 @@ type TaskService interface {
 	GetAllTasks() ([]*models.Task, error)
 	StartTask(userID, taskID uint, startTime time.Time) error
 	StopTask(userID, taskID uint, endTime time.Time) error
+	GetWorkloads(userID uint, startDate, endDate time.Time) ([]*models.Workload, error)
 }
 
 type taskService struct {
@@ -71,4 +72,8 @@ func (s *taskService) StopTask(userID, taskID uint, endTime time.Time) error {
 	task.TotalHours = endTime.Sub(task.StartTime).Hours()
 	_, err = s.taskRepo.Update(task)
 	return err
+}
+
+func (s *taskService) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*models.Workload, error) {
+	return s.taskRepo.GetWorkloads(userID, startDate, endDate)
 }

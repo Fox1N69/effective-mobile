@@ -10,3 +10,8 @@ type Task struct {
 	EndTime    time.Time `json:"end_time"`
 	TotalHours float64   `json:"total_hours"`
 }
+
+type Workload struct {
+	TaskName   string  `json:"taskName"`
+	TotalHours float64 `json:"totalHours"`
+}

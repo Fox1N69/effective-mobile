@@ -51,13 +51,32 @@ func (c *server) handlers() {
 
 func (c *server) v1() {
 	userHandler := v1.NewUserHandler(c.service.UserService())
+	taskHandler := v1.NewTaskHandler(c.service.TaskService())
 
-	user := c.gin.Group("/user")
+	api := c.gin.Group("/api")
 	{
-		user.GET("/", userHandler.GetAllUsers)
-		user.GET("/filters", userHandler.UsersWithFiltersAndPagination)
-		user.POST("/", userHandler.CreateUser)
-		user.PATCH("/:id", userHandler.UpdateUser)
-		user.DELETE("/:id", userHandler.DeleteUser)
+		user := api.Group("/user")
+		{
+			user.GET("/", userHandler.GetAllUsers)
+			user.GET("/filters", userHandler.UsersWithFiltersAndPagination)
+			user.POST("/", userHandler.CreateUser)
+			user.PATCH("/:id", userHandler.UpdateUser)
+			user.DELETE("/:id", userHandler.DeleteUser)
+
+			task := user.Group(":id/task")
+			{
+				task.POST("/:id/start", taskHandler.StartTask)
+				task.POST("/:id/stop", taskHandler.StopTask)
+			}
+		}
+
+		task := api.Group("/task")
+		{
+			task.GET("/", taskHandler.GetAllTasks)
+			task.POST("/:id", taskHandler.CreateTask)
+			task.PATCH("/:id", taskHandler.UpdateTask)
+			task.DELETE("/:id", taskHandler.DeleteTask)
+		}
 	}
+
 }

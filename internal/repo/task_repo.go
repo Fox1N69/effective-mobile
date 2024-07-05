@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"test-task/internal/models"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -13,6 +14,7 @@ type TaskRepo interface {
 	DeleteByID(id uint) error
 	FindByID(id uint) (*models.Task, error)
 	Tasks() ([]*models.Task, error)
+	GetWorkloads(userID uint, startDate, endDate time.Time) ([]*models.Workload, error)
 }
 
 type taskRepo struct {
@@ -113,4 +115,35 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*models.Workload, error) {
+	query := `
+		SELECT task_name, SUM(hours) AS total_hours
+		FROM tasks
+		WHERE user_id = $1 AND start_time >= $2 AND end_time <= $3
+		GROUP BY task_name
+		ORDER BY total_hours DESC
+	`
+
+	rows, err := r.db.Query(query, userID, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	workloads := make([]*models.Workload, 0)
+	for rows.Next() {
+		var workload models.Workload
+		err := rows.Scan(&workload.TaskName, &workload.TotalHours)
+		if err != nil {
+			return nil, err
+		}
+		workloads = append(workloads, &workload)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return workloads, nil
 }

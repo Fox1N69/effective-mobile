@@ -9,6 +9,7 @@ import (
 
 type ServiceManager interface {
 	UserService() service.UserService
+	TaskService() service.TaskService
 }
 
 type serviceManager struct {
