@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"test-task/common/util/smtp"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
@@ -23,12 +23,10 @@ type Infra interface {
 	Migrate(values ...interface{})
 	Port() string
 	RedisClient() *redis.Client
-	SMTPClient() smtp.SmtpClient
 }
 
 type infra struct {
 	configFile string
-	smtpClient smtp.SmtpClient
 }
 
 func New(configFile string) Infra {
@@ -42,6 +40,11 @@ var (
 
 func (i *infra) Config() *viper.Viper {
 	vprOnce.Do(func() {
+		err := godotenv.Load()
+		if err != nil {
+			logrus.Fatalf("Error loading .env file")
+		}
+
 		viper.SetConfigFile(i.configFile)
 		if err := viper.ReadInConfig(); err != nil {
 			logrus.Fatalf("[infra][Config][viper.ReadInConfig] %v", err)
@@ -172,8 +175,4 @@ func (i *infra) RedisClient() *redis.Client {
 	})
 
 	return rdb
-}
-
-func (i *infra) SMTPClient() smtp.SmtpClient {
-	return i.smtpClient
 }
