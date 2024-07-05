@@ -5,6 +5,8 @@ import (
 
 	"test-task/infra"
 	"test-task/internal/repo"
+
+	"github.com/sirupsen/logrus"
 )
 
 type RepoManager interface {
@@ -42,7 +44,7 @@ var (
 // TaskRepo return an instance of the TaskRepo implementation through the RepoMangaer
 func (rm *repoManager) TaskRepo() repo.TaskRepo {
 	taskRepoOnce.Do(func() {
-		taskRepo = repo.NewTaskRepo(rm.infra.SQLClient().DB)
+		taskRepo = repo.NewTaskRepo(rm.infra.SQLClient().DB, logrus.New())
 	})
 	return taskRepo
 }

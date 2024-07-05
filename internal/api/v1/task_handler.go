@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"test-task/common/http/response"
 	"test-task/internal/models"
 	"test-task/internal/service"
 
@@ -101,13 +102,29 @@ func (h *taskHandler) GetAllTasks(c *gin.Context) {
 }
 
 func (h *taskHandler) StartTask(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Query("userId"))
-	taskID, _ := strconv.Atoi(c.Query("taskId"))
+	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 64)
+	if err != nil {
+		response.New(c).Error(http.StatusBadRequest, err)
+		return
+	}
+
+	taskID, err := strconv.ParseUint(c.Param("task_id"), 10, 64)
+	if err != nil {
+		response.New(c).Error(http.StatusBadRequest, err)
+		return
+	}
+
+	task, err := h.taskService.GetTaskByID(uint(taskID))
+	if err != nil {
+		response.New(c).Error(http.StatusNotFound, err) // Возвращаем 404 если задача не найдена
+		return
+	}
+
 	startTime := time.Now()
 
-	err := h.taskService.StartTask(uint(userID), uint(taskID), startTime)
+	err = h.taskService.StartTask(uint(userID), task.ID, startTime)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -115,11 +132,27 @@ func (h *taskHandler) StartTask(c *gin.Context) {
 }
 
 func (h *taskHandler) StopTask(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Query("userId"))
-	taskID, _ := strconv.Atoi(c.Query("taskId"))
+	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 64)
+	if err != nil {
+		response.New(c).Error(http.StatusBadRequest, err)
+		return
+	}
+
+	taskID, err := strconv.ParseUint(c.Param("task_id"), 10, 64)
+	if err != nil {
+		response.New(c).Error(http.StatusBadRequest, err)
+		return
+	}
+
+	task, err := h.taskService.GetTaskByID(uint(taskID))
+	if err != nil {
+		response.New(c).Error(http.StatusNotFound, err)
+		return
+	}
+
 	endTime := time.Now()
 
-	err := h.taskService.StopTask(uint(userID), uint(taskID), endTime)
+	err = h.taskService.StopTask(uint(userID), task.ID, endTime)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

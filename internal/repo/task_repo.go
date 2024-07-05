@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type TaskRepo interface {
@@ -18,15 +19,26 @@ type TaskRepo interface {
 }
 
 type taskRepo struct {
-	db *sql.DB
+	db  *sql.DB
+	log *logrus.Logger
 }
 
-func NewTaskRepo(db *sql.DB) TaskRepo {
-	return &taskRepo{db: db}
+func NewTaskRepo(db *sql.DB, log *logrus.Logger) TaskRepo {
+	return &taskRepo{
+		db:  db,
+		log: log,
+	}
+}
+
+func (r *taskRepo) logError(err error, format string, args ...interface{}) {
+	if err != nil {
+		r.log.Errorf(format+": %s", append(args, err)...)
+	}
 }
 
 func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
-	const query = `
+	const op = "repo.taskRepo.Create"
+	query := `
 		INSERT INTO tasks (user_id, name, description ,start_time, end_time, total_hours)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
@@ -34,6 +46,7 @@ func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
 
 	err := r.db.QueryRow(query, task.UserID, task.Name, task.Description, task.StartTime, task.EndTime, task.TotalHours).Scan(&task.ID)
 	if err != nil {
+		r.logError(err, "failed to create task", op)
 		return nil, errors.Wrap(err, "failed to create task")
 	}
 
@@ -41,7 +54,8 @@ func (r *taskRepo) Create(task *models.Task) (*models.Task, error) {
 }
 
 func (r *taskRepo) Update(task *models.Task) (*models.Task, error) {
-	const query = `
+	const op = "repo.taskRepo.Update"
+	query := `
 		UPDATE tasks
 		SET user_id = $1, name = $2, start_time = $3, end_time = $4, total_hours = $5
 		WHERE id = $6
@@ -49,6 +63,7 @@ func (r *taskRepo) Update(task *models.Task) (*models.Task, error) {
 
 	_, err := r.db.Exec(query, task.UserID, task.Name, task.StartTime, task.EndTime, task.TotalHours, task.ID)
 	if err != nil {
+		r.logError(err, "failed to update task", op)
 		return nil, errors.Wrap(err, "failed to update task")
 	}
 
@@ -56,13 +71,15 @@ func (r *taskRepo) Update(task *models.Task) (*models.Task, error) {
 }
 
 func (r *taskRepo) DeleteByID(id uint) error {
-	const query = `
+	const op = "repo.taskRepo.DeleteByID"
+	query := `
 		DELETE FROM tasks
 		WHERE id = $1
 	`
 
 	_, err := r.db.Exec(query, id)
 	if err != nil {
+		r.logError(err, "failed to delete task", op)
 		return errors.Wrap(err, "failed to delete task")
 	}
 
@@ -70,8 +87,9 @@ func (r *taskRepo) DeleteByID(id uint) error {
 }
 
 func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
-	const query = `
-		SELECT *
+	const op = "repo.taskRepo.FindByID"
+	query := `
+		SELECT id, user_id, name, start_time, end_time, total_hours
 		FROM tasks
 		WHERE id = $1
 	`
@@ -80,8 +98,10 @@ func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 	err := r.db.QueryRow(query, id).Scan(&task.ID, &task.UserID, &task.Name, &task.StartTime, &task.EndTime, &task.TotalHours)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			r.logError(err, "task not found", op)
 			return nil, errors.Wrap(err, "task not found")
 		}
+		r.logError(err, "failed to fetch task", op)
 		return nil, errors.Wrap(err, "failed to fetch task")
 	}
 
@@ -89,13 +109,15 @@ func (r *taskRepo) FindByID(id uint) (*models.Task, error) {
 }
 
 func (r *taskRepo) Tasks() ([]*models.Task, error) {
-	const query = `
+	const op = "repo.taskRepo.Tasks"
+	query := `
 		SELECT *
 		FROM tasks
 	`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
+		r.logError(err, "failed to fetch tasks", op)
 		return nil, errors.Wrap(err, "failed to fetch tasks")
 	}
 	defer rows.Close()
@@ -105,12 +127,14 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 		var task models.Task
 		err := rows.Scan(&task.ID, &task.UserID, &task.Name, &task.StartTime, &task.EndTime, &task.TotalHours)
 		if err != nil {
+			r.logError(err, "failed to scan task row", op)
 			return nil, errors.Wrap(err, "failed to scan task row")
 		}
 		tasks = append(tasks, &task)
 	}
 
 	if err := rows.Err(); err != nil {
+		r.logError(err, "error in fetching tasks rows", op)
 		return nil, errors.Wrap(err, "error in fetching tasks rows")
 	}
 
@@ -118,6 +142,8 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 }
 
 func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*models.Workload, error) {
+	const op = "repo.taskRepo.GetWorkloads"
+
 	query := `
 		SELECT task_name, SUM(hours) AS total_hours
 		FROM tasks
@@ -128,7 +154,8 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 
 	rows, err := r.db.Query(query, userID, startDate, endDate)
 	if err != nil {
-		return nil, err
+		r.logError(err, "failed to fetch workloads", op)
+		return nil, errors.Wrap(err, "failed to fetch workloads")
 	}
 	defer rows.Close()
 
@@ -137,12 +164,14 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 		var workload models.Workload
 		err := rows.Scan(&workload.TaskName, &workload.TotalHours)
 		if err != nil {
-			return nil, err
+			r.logError(err, "failed to scan workload row", op)
+			return nil, errors.Wrap(err, "failed to scan workload row")
 		}
 		workloads = append(workloads, &workload)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, err
+		r.logError(err, "error in fetching workloads rows", op)
+		return nil, errors.Wrap(err, "error in fetching workloads rows")
 	}
 
 	return workloads, nil

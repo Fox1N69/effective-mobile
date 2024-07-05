@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"test-task/internal/models"
 	"test-task/internal/repo"
 	"time"
@@ -53,7 +54,6 @@ func (s *taskService) StartTask(userID, taskID uint, startTime time.Time) error 
 		return err
 	}
 
-	// Perform logic to start task timing
 	task.StartTime = startTime
 	_, err = s.taskRepo.Update(task)
 	return err
@@ -65,11 +65,15 @@ func (s *taskService) StopTask(userID, taskID uint, endTime time.Time) error {
 		return err
 	}
 
-	// Perform logic to stop task timing
 	task.EndTime = endTime
 
-	// Calculate total hours or other metrics if needed
-	task.TotalHours = endTime.Sub(task.StartTime).Hours()
+	if task.EndTime.Before(task.StartTime) {
+		return errors.New("endTime should be after startTime")
+	}
+
+	duration := task.EndTime.Sub(task.StartTime)
+	task.TotalHours = duration.Hours()
+
 	_, err = s.taskRepo.Update(task)
 	return err
 }

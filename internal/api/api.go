@@ -55,6 +55,7 @@ func (c *server) v1() {
 
 	api := c.gin.Group("/api")
 	{
+		api.Use(c.middleware.CORS())
 		user := api.Group("/user")
 		{
 			user.GET("/", userHandler.GetAllUsers)
@@ -65,7 +66,7 @@ func (c *server) v1() {
 			user.DELETE("/:id", userHandler.DeleteUser)
 
 			// Вложенная группа для задач пользователя
-			task := user.Group("/:id/task")
+			task := user.Group("/:user_id/task")
 			{
 				task.POST("/:task_id/start", taskHandler.StartTask)
 				task.POST("/:task_id/stop", taskHandler.StopTask)
