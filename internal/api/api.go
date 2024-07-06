@@ -8,6 +8,8 @@ import (
 	"test-task/internal/manager"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server interface {
@@ -22,7 +24,6 @@ type server struct {
 }
 
 func NewServer(infra infra.Infra) Server {
-
 	return &server{
 		infra:      infra,
 		gin:        gin.Default(),
@@ -52,7 +53,6 @@ func (c *server) v1() {
 
 	api := c.gin.Group("/api")
 	{
-		api.Use(c.middleware.CORS())
 		user := api.Group("/user")
 		{
 			user.GET("/", userHandler.GetAllUsers)
@@ -71,11 +71,12 @@ func (c *server) v1() {
 
 		tasks := api.Group("/task")
 		{
-
 			tasks.POST("/", taskHandler.CreateTask)
 			tasks.GET("/", taskHandler.GetAllTasks)
 			tasks.PATCH("/:id", taskHandler.UpdateTask)
 			tasks.DELETE("/:id", taskHandler.DeleteTask)
 		}
 	}
+
+	c.gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }

@@ -15,3 +15,7 @@ type Pagination struct {
 	Page     int `json:"page"`
 	PageSize int `json:"pageSize"`
 }
+
+type SuccessResponse struct {
+	Message string `json:"message"`
+}

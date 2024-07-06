@@ -1,0 +1,432 @@
+basePath: /api
+definitions:
+  models.Response:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Task:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      start_time:
+        type: string
+      total_hours:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      passportNumber:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+      text:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:4000
+info:
+  contact: {}
+  description: tag for service api
+  title: Tag Service API
+paths:
+  /api/task:
+    post:
+      consumes:
+      - application/json
+      description: Create a new task based on data received from the request.
+      parameters:
+      - description: Task object to be created
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: createdTask
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create a new task
+      tags:
+      - tasks
+  /api/task/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a task based on the ID received from the request.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Delete a task
+      tags:
+      - tasks
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a task based on the ID received from the request.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: task
+          schema:
+            $ref: '#/definitions/models.Task'
+        "404":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get a task by ID
+      tags:
+      - tasks
+    patch:
+      consumes:
+      - application/json
+      description: Update task data based on data received from the request.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated task object
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: updatedTask
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update a task
+      tags:
+      - tasks
+  /api/tasks:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all tasks.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: tasks
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get all tasks
+      tags:
+      - tasks
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all users.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user based on data received from the request.
+      parameters:
+      - description: User object to be created
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: createdUser
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create a new user
+      tags:
+      - users
+  /api/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user based on the ID received from the request.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Delete a user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Updates user data based on data received from the request.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated user object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: updatedUser
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update a user
+      tags:
+      - users
+  /api/user/{user_id}/task/{task_id}/start:
+    post:
+      consumes:
+      - application/json
+      description: Start a task for a specific user based on user and task IDs received
+        from the request.
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Start a task
+      tags:
+      - tasks
+  /api/user/{user_id}/task/{task_id}/stop:
+    post:
+      consumes:
+      - application/json
+      description: Stop a task for a specific user based on user and task IDs received
+        from the request.
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Task ID
+        in: path
+        name: task_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Stop a task
+      tags:
+      - tasks
+  /api/user/{user_id}/workloads:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve workloads for a specific user within a specified date
+        range.
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get workloads
+      tags:
+      - tasks
+  /api/user/filters:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves users with filters and pagination parameters.
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get users with filters and pagination
+      tags:
+      - users
+swagger: "2.0"
