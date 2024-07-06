@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	// Connect to config and set mode
 	i := infra.New("config/config.json")
 	i.SetMode()
 
