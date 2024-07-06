@@ -38,7 +38,6 @@ func (s *userService) UsersWithFiltersAndPagination(params models.UserFilters, p
 }
 
 func (s *userService) CreateUser(passportNumber string) (*models.User, error) {
-	// Разделите паспорт на серию и номер
 	parts := strings.Split(passportNumber, " ")
 	if len(parts) != 2 {
 		return nil, errors.New("invalid passport number format")
@@ -46,13 +45,11 @@ func (s *userService) CreateUser(passportNumber string) (*models.User, error) {
 	passportSerie := parts[0]
 	passportNumber = parts[1]
 
-	// Получите информацию из внешнего API
 	peopleInfo, err := s.userApiClient.FetchUserInfo(passportSerie, passportNumber)
 	if err != nil {
 		return nil, err
 	}
 
-	// Создайте нового пользователя с полученной информацией
 	user := &models.User{
 		PassportNumber: passportNumber,
 		Surname:        peopleInfo.Surname,
