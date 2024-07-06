@@ -8,7 +8,6 @@ import (
 	"test-task/internal/manager"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 )
 
 type Server interface {
@@ -16,21 +15,19 @@ type Server interface {
 }
 
 type server struct {
-	infra       infra.Infra
-	gin         *gin.Engine
-	service     manager.ServiceManager
-	middleware  middleware.Middleware
-	redisClient *redis.Client
+	infra      infra.Infra
+	gin        *gin.Engine
+	service    manager.ServiceManager
+	middleware middleware.Middleware
 }
 
-func NewServer(infra infra.Infra, redisClient *redis.Client) Server {
+func NewServer(infra infra.Infra) Server {
 
 	return &server{
-		infra:       infra,
-		gin:         gin.Default(),
-		service:     manager.NewServiceManager(infra),
-		middleware:  middleware.NewMiddleware(infra.Config().GetString("secret.key")),
-		redisClient: redisClient,
+		infra:      infra,
+		gin:        gin.Default(),
+		service:    manager.NewServiceManager(infra),
+		middleware: middleware.NewMiddleware(infra.Config().GetString("secret.key")),
 	}
 }
 

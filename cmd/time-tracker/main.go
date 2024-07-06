@@ -14,5 +14,5 @@ func main() {
 	i.RunSQLMigrations()
 
 	// Start Api server
-	api.NewServer(i, i.RedisClient()).Run()
+	api.NewServer(i).Run()
 }
