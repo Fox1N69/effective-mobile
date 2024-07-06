@@ -1,8 +1,11 @@
 # Текстовое задание для Effective Mobile
 
-В данном проекте я реализовал api для task-tracker.
+В данном проекте я реализовал api для task-tracker c использованием сторонего api для получения доп информации о пользователях.
 
 ## Запуск приложения
+Перед запуском приложения поменяйте конфигурационные данные в файлe который находится по пути [./config/config.json](./config/config.json)
+
+
 Запуск миграции зависимостей
 
 ```console
@@ -33,6 +36,7 @@ make build-tacker
 air
 ```
 
+
 ## Core library
 
 | Library    | Usage             |
@@ -42,3 +46,4 @@ air
 | postgres   | Database          |
 | logrus     | Logger library    |
 | viper      | Config library    |
+
