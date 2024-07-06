@@ -29,11 +29,11 @@ func NewUserHandler(service service.UserService) UserHandler {
 func (h *userHandler) GetAllUsers(c *gin.Context) {
 	users, err := h.service.Users()
 	if err != nil {
-		response.New(c).Error(501, err)
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(200, users)
+	c.JSON(http.StatusOK, users)
 }
 
 func (h *userHandler) UsersWithFiltersAndPagination(c *gin.Context) {
@@ -44,7 +44,7 @@ func (h *userHandler) UsersWithFiltersAndPagination(c *gin.Context) {
 
 	users, err := h.service.UsersWithFiltersAndPagination(models.UserFilters{}, models.Pagination{Page: page, PageSize: pageSize})
 	if err != nil {
-		response.New(c).Error(501, err)
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -56,13 +56,13 @@ func (h *userHandler) CreateUser(c *gin.Context) {
 		PassportNumber string `json:"passportNumber"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	createdUser, err := h.service.CreateUser(input.PassportNumber)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -75,13 +75,13 @@ func (h *userHandler) UpdateUser(c *gin.Context) {
 
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	err := h.service.UpdateUser(uint(id), &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (h *userHandler) DeleteUser(c *gin.Context) {
 
 	err := h.service.DeleteUser(uint(id))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 

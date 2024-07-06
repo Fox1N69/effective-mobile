@@ -36,13 +36,13 @@ func NewTaskHandler(taskService service.TaskService) TaskHandler {
 func (h *taskHandler) CreateTask(c *gin.Context) {
 	var task models.Task
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	createdTask, err := h.taskService.CreateTask(&task)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -54,14 +54,14 @@ func (h *taskHandler) UpdateTask(c *gin.Context) {
 
 	var task models.Task
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	task.ID = uint(taskID)
 	updatedTask, err := h.taskService.UpdateTask(&task)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -71,12 +71,13 @@ func (h *taskHandler) UpdateTask(c *gin.Context) {
 func (h *taskHandler) DeleteTask(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := h.taskService.DeleteTaskByID(uint(taskID)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	err := h.taskService.DeleteTaskByID(uint(taskID))
+	if err != nil {
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{"message": "delete success"})
 }
 
 func (h *taskHandler) GetTaskByID(c *gin.Context) {
@@ -84,7 +85,7 @@ func (h *taskHandler) GetTaskByID(c *gin.Context) {
 
 	task, err := h.taskService.GetTaskByID(uint(taskID))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		response.New(c).Error(http.StatusNotFound, err)
 		return
 	}
 
@@ -94,7 +95,7 @@ func (h *taskHandler) GetTaskByID(c *gin.Context) {
 func (h *taskHandler) GetAllTasks(c *gin.Context) {
 	tasks, err := h.taskService.GetAllTasks()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -128,7 +129,7 @@ func (h *taskHandler) StartTask(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "task started"})
 }
 
 func (h *taskHandler) StopTask(c *gin.Context) {
@@ -154,17 +155,17 @@ func (h *taskHandler) StopTask(c *gin.Context) {
 
 	err = h.taskService.StopTask(uint(userID), task.ID, endTime)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "task stoped"})
 }
 
 func (h *taskHandler) GetWorkloads(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
@@ -173,24 +174,24 @@ func (h *taskHandler) GetWorkloads(c *gin.Context) {
 
 	startDate, err := time.Parse("2006-01-02", startDateStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start date format. Use YYYY-MM-DD"})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	endDate, err := time.Parse("2006-01-02", endDateStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end date format. Use YYYY-MM-DD"})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	if endDate.Before(startDate) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "End date cannot be before start date"})
+		response.New(c).Error(http.StatusBadRequest, err)
 		return
 	}
 
 	workloads, err := h.taskService.GetWorkloads(uint(userID), startDate, endDate)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch workloads"})
+		response.New(c).Error(http.StatusInternalServerError, err)
 		return
 	}
 
