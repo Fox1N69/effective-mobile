@@ -33,6 +33,7 @@ func NewTaskHandler(taskService service.TaskService) TaskHandler {
 	}
 }
 
+// CreateTask creates a new task based on data received from the request.
 func (h *taskHandler) CreateTask(c *gin.Context) {
 	var task models.Task
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -49,6 +50,7 @@ func (h *taskHandler) CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdTask)
 }
 
+// UpdateTask updates task data based on data received from the request.
 func (h *taskHandler) UpdateTask(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 
@@ -68,6 +70,7 @@ func (h *taskHandler) UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedTask)
 }
 
+// DeleteTask deletes a task based on the ID received from the request.
 func (h *taskHandler) DeleteTask(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 
@@ -80,6 +83,7 @@ func (h *taskHandler) DeleteTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "delete success"})
 }
 
+// GetTaskByID retrieves a task based on the ID received from the request.
 func (h *taskHandler) GetTaskByID(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 
@@ -92,6 +96,7 @@ func (h *taskHandler) GetTaskByID(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+// GetAllTasks retrieves a list of all tasks.
 func (h *taskHandler) GetAllTasks(c *gin.Context) {
 	tasks, err := h.taskService.GetAllTasks()
 	if err != nil {
@@ -102,6 +107,7 @@ func (h *taskHandler) GetAllTasks(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
+// StartTask starts a task for a specific user based on user and task IDs received from the request.
 func (h *taskHandler) StartTask(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 64)
 	if err != nil {
@@ -132,6 +138,7 @@ func (h *taskHandler) StartTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "task started"})
 }
 
+// StopTask stops a task for a specific user based on user and task IDs received from the request.
 func (h *taskHandler) StopTask(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 64)
 	if err != nil {
@@ -162,6 +169,7 @@ func (h *taskHandler) StopTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "task stoped"})
 }
 
+// GetWorkloads retrieves workloads for a specific user within a specified date range.
 func (h *taskHandler) GetWorkloads(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {

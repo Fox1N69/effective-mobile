@@ -26,6 +26,7 @@ func NewUserHandler(service service.UserService) UserHandler {
 	return &userHandler{service: service}
 }
 
+// GetAllUsers retrieves a list of all users.
 func (h *userHandler) GetAllUsers(c *gin.Context) {
 	users, err := h.service.Users()
 	if err != nil {
@@ -36,6 +37,7 @@ func (h *userHandler) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
+// UsersWithFiltersAndPagination retrieves users with filters and pagination parameters.
 func (h *userHandler) UsersWithFiltersAndPagination(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	page, _ := strconv.Atoi(pageStr)
@@ -51,6 +53,7 @@ func (h *userHandler) UsersWithFiltersAndPagination(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
+// CreateUser creates a new user based on data received from the request.
 func (h *userHandler) CreateUser(c *gin.Context) {
 	var input struct {
 		PassportNumber string `json:"passportNumber"`
@@ -69,6 +72,7 @@ func (h *userHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "create user success", "user": createdUser})
 }
 
+// UpdateUser updates user data based on data received from the request.
 func (h *userHandler) UpdateUser(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.Atoi(idStr)
@@ -88,6 +92,7 @@ func (h *userHandler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
 }
 
+// DeleteUser deletes a user based on the ID received from the request.
 func (h *userHandler) DeleteUser(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.Atoi(idStr)
