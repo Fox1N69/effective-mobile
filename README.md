@@ -1,7 +1,7 @@
 # Текстовое задание для Effective Mobile
 
 В данном проекте я реализовал api для task-tracker c использованием сторонего api для получения доп информации о пользователях.
-*** Документация к api *** - [swagger](http://localhost:4000/swagger/index.html#/) 
+#### Документация к api  - [swagger](http://localhost:4000/swagger/index.html#/) 
 
 ## Запуск приложения
 Перед запуском приложения поменяйте конфигурационные данные в файлe который находится по пути [./config/config.json](./config/config.json)
