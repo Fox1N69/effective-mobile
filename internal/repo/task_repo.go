@@ -102,12 +102,13 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 	const op = "repo.taskRepo.Tasks"
 
 	query := `
-		SELECT *
+		SELECT id, user_id, name, description, start_time, end_time, total_hours, created_at, updated_at
 		FROM tasks
 	`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
+		r.log.Debugf("%s %w", op, err)
 		return nil, fmt.Errorf("%s %w", op, err)
 	}
 	defer rows.Close()
@@ -115,14 +116,26 @@ func (r *taskRepo) Tasks() ([]*models.Task, error) {
 	var tasks []*models.Task
 	for rows.Next() {
 		var task models.Task
-		err := rows.Scan(&task.ID, &task.UserID, &task.Name, &task.StartTime, &task.EndTime, &task.TotalHours)
+		err := rows.Scan(
+			&task.ID,
+			&task.UserID,
+			&task.Name,
+			&task.Description,
+			&task.StartTime,
+			&task.EndTime,
+			&task.TotalHours,
+			&task.CreatedAt,
+			&task.UpdatedAt,
+		)
 		if err != nil {
+			r.log.Debugf("%s %w", op, err)
 			return nil, fmt.Errorf("%s %w", op, err)
 		}
 		tasks = append(tasks, &task)
 	}
 
 	if err := rows.Err(); err != nil {
+		r.log.Debugf("%s %w", op, err)
 		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
@@ -155,6 +168,7 @@ func (r *taskRepo) GetWorkloads(userID uint, startDate, endDate time.Time) ([]*m
 		}
 		workloads = append(workloads, &workload)
 	}
+
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("%s %w", op, err)
 	}

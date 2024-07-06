@@ -72,7 +72,6 @@ func (c *server) v1() {
 			}
 		}
 
-		// Роуты для задач
 		tasks := api.Group("/task")
 		{
 

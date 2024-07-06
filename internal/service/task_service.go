@@ -58,7 +58,7 @@ func (s *taskService) StartTask(userID, taskID uint, startTime time.Time) error 
 	if err != nil {
 		return err
 	}
-	return nil
+	return err
 }
 
 func (s *taskService) StopTask(userID, taskID uint, endTime time.Time) error {

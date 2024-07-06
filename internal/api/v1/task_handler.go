@@ -10,7 +10,6 @@ import (
 	"test-task/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type TaskHandler interface {
@@ -191,7 +190,6 @@ func (h *taskHandler) GetWorkloads(c *gin.Context) {
 
 	workloads, err := h.taskService.GetWorkloads(uint(userID), startDate, endDate)
 	if err != nil {
-		logrus.Error(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch workloads"})
 		return
 	}
