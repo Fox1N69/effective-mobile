@@ -186,6 +186,8 @@ func (i *infra) SQLClient() *clients.SQLClient {
 	client := clients.NewSQLClient()
 	client.Connect(user, pass, host, port, name)
 
+	logrus.Info("SQClient connected")
+
 	return client
 }
 
