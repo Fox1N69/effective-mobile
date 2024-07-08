@@ -1,4 +1,4 @@
-# Текстовое задание для Effective Mobile
+# Тестовое задание для Effective Mobile
 
 В данном проекте я реализовал api для task-tracker c использованием сторонего api для получения доп информации о пользователях.
 #### Документация к api  - localhost:4000/swagger/index.html#/
